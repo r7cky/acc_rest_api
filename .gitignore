@@ -1,0 +1,15 @@
+# C/C++
+*.o
+*.a
+
+# Vim
+*~
+*.swp
+
+# Python
+*.py[ocd]
+__pycache__
+_venv
+
+# Mac
+.DS_Store

@@ -11,75 +11,31 @@ class User extends REST_Controller {
     function __construct() {
         // Construct the parent class
         parent::__construct();
+		$this->load->model('user_model');
     }
 	
-	public function key_with_login_get() {
-        // Users from a data store e.g. database
-        $users = [
-            ['id' => 1, 'name' => 'John', 'email' => 'john@example.com', 'fact' => 'Loves coding'],
-            ['id' => 2, 'name' => 'Jim', 'email' => 'jim@example.com', 'fact' => 'Developed on CodeIgniter'],
-            ['id' => 3, 'name' => 'Jane', 'email' => 'jane@example.com', 'fact' => 'Lives in the USA', ['hobbies' => ['guitar', 'cycling']]],
-        ];
-
-        $id = $this->get('id');
-
-        // If the id parameter doesn't exist return all the users
-
-        if ($id === NULL)
-        {
-            // Check if the users data store contains users (in case the database result returns NULL)
-            if ($users)
-            {
-                // Set the response and exit
-                $this->response($users, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
-            }
-            else
-            {
-                // Set the response and exit
-                $this->response([
-                    'status' => FALSE,
-                    'message' => 'No users were found'
-                ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-            }
-        }
-
-        // Find and return a single record for a particular user.
-
-        $id = (int) $id;
-
-        // Validate the id.
-        if ($id <= 0)
-        {
-            // Invalid id, set the response and exit.
-            $this->response(NULL, REST_Controller::HTTP_BAD_REQUEST); // BAD_REQUEST (400) being the HTTP response code
-        }
-
-        // Get the user from the array, using the id as key for retrieval.
-        // Usually a model is to be used for this.
-
-        $user = NULL;
-
-        if (!empty($users))
-        {
-            foreach ($users as $key => $value)
-            {
-                if (isset($value['id']) && $value['id'] === $id)
-                {
-                    $user = $value;
-                }
-            }
-        }
-
-        if (!empty($user))
-        {
-            $this->set_response($user, REST_Controller::HTTP_OK); // OK (200) being the HTTP response code
-        }
-        else
-        {
-            $this->set_response([
-                'status' => FALSE,
-                'message' => 'User could not be found'
-            ], REST_Controller::HTTP_NOT_FOUND); // NOT_FOUND (404) being the HTTP response code
-        }
+	public function key_with_login_post() {
+		$login_info['email'] = $this->post('email');
+		$login_info['password'] = $this->post('password');
+		$login_info['session_type'] = $this->post('session_type');
+		$login_info['ip_address'] = $this->input->ip_address();
+		$this->form_validation->set_data($login_info);
+		
+		$this->form_validation->set_rules('email', 'Email', 'required|valid_email');
+		$this->form_validation->set_rules('password', 'Password', 'required');
+		$this->form_validation->set_rules('session_type', 'Session Type', 'in_list[admin,teacher]');
+		$this->form_validation->set_rules('ip_address', 'IP Address', 'required|valid_ip');
+		
+		if($this->form_validation->run() == FALSE) {
+			$this->response(['status' => FALSE, 'message' => 'An error occured regarding login information', 'errors' => $this->form_validation->error_array()]);
+		}else {
+			$response_info = $this->user_model->key_with_login($login_info);
+			if ($response_info['status'] == TRUE) {
+				$this->response(['status' => $response_info['status'], 'message' => $response_info['message'], "session_key" => $response_info['session_key']], REST_Controller::HTTP_OK);
+			}else {
+				$this->response(['status' => $response_info['status'], 'message' => $response_info['message'], "session_key" => $response_info['session_key']], REST_Controller::HTTP_BAD_REQUEST);
+			}
+			
+		}
 	}
 }

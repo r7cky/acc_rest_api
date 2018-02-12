@@ -30,13 +30,12 @@ INSERT INTO `misc__device_type` (`device_type_id`, `device_type_name`) VALUES
 
 CREATE TABLE IF NOT EXISTS `user__info` (
   `user_id` int(11) NOT NULL AUTO_INCREMENT,
-  `user_name` varchar(250) NOT NULL,
+  `email` varchar(250) DEFAULT NULL,
   `password` varchar(250) NOT NULL,
   `device_id` varchar(250) DEFAULT NULL,
   `device_type_id` int(11) DEFAULT NULL,
   `first_name` varchar(250) NOT NULL,
   `last_name` varchar(250) NOT NULL,
-  `email` varchar(250) DEFAULT NULL,
   `session_key` varchar(250),
   `created_date` datetime NOT NULL,
   `updated_date` datetime NOT NULL,
@@ -50,10 +49,10 @@ CREATE TABLE IF NOT EXISTS `user__info` (
 -- Dumping data for table `user__info`
 --
 
-INSERT INTO `user__info` (`user_id`, `user_name`, `password`, `device_id`, `device_type_id`, `first_name`, `last_name`, `email`, `created_date`, `updated_date`) VALUES
-(1, 'admin', '$2y$10$mTDnE0wE11jCX/VbwkKvpuEU41jJACPAwpJvqCAjVc3k3mBrFleLO', 'device1', 1, 'Admin', 'LastName', 'admin@example.com', '2015-04-28 10:52:39', '2016-05-21 12:44:19'),
-(2, 'user1', '$2y$10$mTDnE0wE11jCX/VbwkKvpuEU41jJACPAwpJvqCAjVc3k3mBrFleLO', 'device2', 1, 'User', 'One', 'user1@example.com', '2016-10-04 02:11:45', '2016-10-04 02:11:45'),
-(3, 'user2', '$2y$10$mTDnE0wE11jCX/VbwkKvpuEU41jJACPAwpJvqCAjVc3k3mBrFleLO', 'device3', 1, 'User', 'Two', 'user2@example.com', '2016-10-04 02:11:45', '2016-10-04 02:11:45');
+INSERT INTO `user__info` (`user_id`, `email`, `password`, `device_id`, `device_type_id`, `first_name`, `last_name`, `created_date`, `updated_date`) VALUES
+(1, 'admin@example.com', '$2y$10$mTDnE0wE11jCX/VbwkKvpuEU41jJACPAwpJvqCAjVc3k3mBrFleLO', 'device1', 1, 'Admin', 'LastName',  '2015-04-28 10:52:39', '2016-05-21 12:44:19'),
+(2, 'user1@example.com', '$2y$10$mTDnE0wE11jCX/VbwkKvpuEU41jJACPAwpJvqCAjVc3k3mBrFleLO', 'device2', 1, 'User', 'One', '2016-10-04 02:11:45', '2016-10-04 02:11:45'),
+(3, 'user2@example.com', '$2y$10$mTDnE0wE11jCX/VbwkKvpuEU41jJACPAwpJvqCAjVc3k3mBrFleLO', 'device3', 1, 'User', 'Two', '2016-10-04 02:11:45', '2016-10-04 02:11:45');
 
 -- --------------------------------------------------------
 
@@ -327,3 +326,18 @@ CREATE TABLE IF NOT EXISTS `report__comment_info` (
 
 INSERT INTO `report__comment_info` (`reporter_user_id`, `reported_comment_id`, `reported_date`) VALUES
 (2, 1, '2016-05-21 12:44:19');
+
+--
+-- Table structure for table `user__login_attempt`
+--
+
+CREATE TABLE IF NOT EXISTS `user__login_attempt` (
+  `login_attempt_id` int(11) NOT NULL AUTO_INCREMENT,
+  `ip_address` varchar(45) NOT NULL,
+  `user_id` int(11) NOT NULL,
+  `time` datetime NOT NULL,
+  `successful_login` BOOLEAN NOT NULL,
+  `reason` varchar(250) NOT NULL,
+  CONSTRAINT `fk_user_id_user__login_attempt` FOREIGN KEY (`user_id`) REFERENCES `user__info` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  PRIMARY KEY (`login_attempt_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

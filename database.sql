@@ -217,11 +217,13 @@ INSERT INTO `post__detail` (`post_detail_id`, `post_id`, `post_character_count`,
 CREATE TABLE IF NOT EXISTS `comment__info` (
   `comment_id` int(11) NOT NULL AUTO_INCREMENT,
   `post_id` int(11) NOT NULL,
+  `parent_comment_id` int(11) DEFAULT NULL,
   `owner_user_id` int(11) NOT NULL,
   `comment_text` TEXT NOT NULL,
   `is_deleted` BOOLEAN NOT NULL DEFAULT 0,
   `comment_date` datetime NOT NULL,
   `updated_date` datetime NOT NULL,
+  CONSTRAINT `fk_parent_comment_id_comment__info` FOREIGN KEY (`parent_comment_id`) REFERENCES `comment__info` (`comment_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `fk_post_id_comment__info` FOREIGN KEY (`post_id`) REFERENCES `post__info` (`post_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   CONSTRAINT `fk_user_id_comment__info` FOREIGN KEY (`owner_user_id`) REFERENCES `user__info` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   PRIMARY KEY (`comment_id`)
@@ -237,23 +239,91 @@ INSERT INTO `comment__info` (`comment_id`, `owner_user_id`, `post_id`, `comment_
 -- --------------------------------------------------------
 
 --
--- Table structure for table `vote__info`
+-- Table structure for table `vote__post_info`
 --
 
-CREATE TABLE IF NOT EXISTS `vote__info` (
+CREATE TABLE IF NOT EXISTS `vote__post_info` (
   `user_id` int(11) NOT NULL,
   `post_id` int(11) NOT NULL,
   `is_upvote` BOOLEAN NOT NULL,
   `vote_date` datetime NOT NULL,
   `updated_date` datetime NOT NULL,
-  CONSTRAINT `fk_user_id_vote__info` FOREIGN KEY (`user_id`) REFERENCES `user__info` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
-  CONSTRAINT `fk_post_id_vote__info` FOREIGN KEY (`post_id`) REFERENCES `post__info` (`post_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_user_id_vote__post_info` FOREIGN KEY (`user_id`) REFERENCES `user__info` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_post_id_vote__post_info` FOREIGN KEY (`post_id`) REFERENCES `post__info` (`post_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
   PRIMARY KEY (`user_id`, `post_id`)
-) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=122 ;
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=122;
 
 --
--- Dumping data for table `vote__info`
+-- Dumping data for table `vote__post_info`
 --
 
-INSERT INTO `vote__info` (`user_id`, `post_id`, `is_upvote`, `vote_date`, `updated_date`) VALUES
+INSERT INTO `vote__post_info` (`user_id`, `post_id`, `is_upvote`, `vote_date`, `updated_date`) VALUES
 (2, 1, 1, '2015-04-28 10:52:39', '2016-05-21 12:44:19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `vote__comment_info`
+--
+
+CREATE TABLE IF NOT EXISTS `vote__comment_info` (
+  `user_id` int(11) NOT NULL,
+  `comment_id` int(11) NOT NULL,
+  `is_upvote` BOOLEAN NOT NULL,
+  `vote_date` datetime NOT NULL,
+  `updated_date` datetime NOT NULL,
+  CONSTRAINT `fk_user_id_vote__comment_info` FOREIGN KEY (`user_id`) REFERENCES `user__info` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_comment_id_vote__comment_info` FOREIGN KEY (`comment_id`) REFERENCES `comment__info` (`comment_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  PRIMARY KEY (`user_id`, `comment_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=122;
+
+--
+-- Dumping data for table `vote__comment_info`
+--
+
+INSERT INTO `vote__comment_info` (`user_id`, `comment_id`, `is_upvote`, `vote_date`, `updated_date`) VALUES
+(2, 1, 1, '2015-04-28 10:52:39', '2016-05-21 12:44:19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `report__post_info`
+--
+
+CREATE TABLE IF NOT EXISTS `report__post_info` (
+  `reporter_user_id` int(11) NOT NULL,
+  `reported_post_id` int(11) NOT NULL,
+  `reported_date` datetime NOT NULL,
+  CONSTRAINT `fk_reporter_user_id_vote__post_info` FOREIGN KEY (`reporter_user_id`) REFERENCES `user__info` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_reported_post_id_report__post_info` FOREIGN KEY (`reported_post_id`) REFERENCES `post__info` (`post_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  PRIMARY KEY (`reporter_user_id`, `reported_post_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=122;
+
+--
+-- Dumping data for table `report__post_info`
+--
+
+INSERT INTO `report__post_info` (`reporter_user_id`, `reported_post_id`, `reported_date`) VALUES
+(2, 1, '2016-05-21 12:44:19');
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `report__comment_info`
+--
+
+CREATE TABLE IF NOT EXISTS `report__comment_info` (
+  `reporter_user_id` int(11) NOT NULL,
+  `reported_comment_id` int(11) NOT NULL,
+  `reported_date` datetime NOT NULL,
+  CONSTRAINT `fk_reporter_user_id_vote__comment_info` FOREIGN KEY (`reporter_user_id`) REFERENCES `user__info` (`user_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  CONSTRAINT `fk_reported_comment_id_report__comment_info` FOREIGN KEY (`reported_comment_id`) REFERENCES `comment__info` (`comment_id`) ON DELETE CASCADE ON UPDATE NO ACTION,
+  PRIMARY KEY (`reporter_user_id`, `reported_comment_id`)
+) ENGINE=InnoDB  DEFAULT CHARSET=latin1 AUTO_INCREMENT=122;
+
+--
+-- Dumping data for table `report__comment_info`
+--
+
+INSERT INTO `report__comment_info` (`reporter_user_id`, `reported_comment_id`, `reported_date`) VALUES
+(2, 1, '2016-05-21 12:44:19');

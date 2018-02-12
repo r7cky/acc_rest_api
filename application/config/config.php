@@ -35,7 +35,7 @@ $config['base_url'] = 'localhost/codeigniter_rest_test';
 | variable so that it is blank.
 |
 */
-$config['index_page'] = 'index.php';
+$config['index_page'] = '';
 
 /*
 |--------------------------------------------------------------------------

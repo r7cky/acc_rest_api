@@ -10,6 +10,47 @@ class User_model extends CI_Model {
 		$this->load->model('predis_model');
 	}
 	
+	public function insert_user($user_data) {
+		//hash the password before continuing
+		$user_data['password'] = password_hash($user_data['password'], PASSWORD_DEFAULT);
+		
+		//removes blank data
+		foreach ($user_data as $key => $value) {
+			if (empty($value)) {
+				$array = array(
+					"status" => FALSE,
+					'message' => 'Please enter all values for user registration',
+				);
+			
+				return $array;
+			}
+		}
+		
+		$this->db->trans_start();
+		//$user_data['error_test'] = 0;
+		$inserted_user_id = $this->user_dao->insert_user($user_data);
+		$this->db->trans_complete();
+		$is_insert_success = $this->db->trans_status();
+		
+		if ($is_insert_success) {
+			$this->db->trans_commit();
+			
+			$array = array(
+				"status" => TRUE,
+				'message' => 'User successfuly registered',
+			);
+			return $array;
+		}else {
+			$this->db->trans_rollback();
+			
+			$array = array(
+				"status" => FALSE,
+				'message' => 'Error occured inserting user into database. Please contact admin',
+			);
+			return $array;
+		}
+	}
+	
 	public function key_with_login($login_info) {
 		//extracting info from array
 		$email = $login_info['email'];

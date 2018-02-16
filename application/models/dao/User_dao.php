@@ -46,6 +46,11 @@ class User_dao extends CI_Model {
 	}
 	
 	// **INSERT**
+	public function insert_user($user_data) {
+		$this->db->insert('user__info', $user_data);
+		return $this->db->insert_id();
+	}
+	
 	public function insert_login_attempt($login_data) {
 		$this->db->insert('user__login_attempt', $login_data);
 		return $this->db->affected_rows() > 0;
